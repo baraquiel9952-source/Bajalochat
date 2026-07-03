@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bajaloya - Trámites Express v4</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: #efeae2;
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 80 80"><g fill="%23e5ddd5" fill-opacity="0.4"><path d="M10 0h10v10H10zm20 20h10v10H30zm20 20h10v10H50zm20 20h10v10H70zM0 50h10v10H0zm20 20h10v10H20z"/></g></svg>');
+            display: block;
+            height: 100vh;
+            color: #111b21;
+        }
+
+        /* Encabezado estilo WhatsApp */
+        .header {
+            background-color: #008069;
+            color: white;
+            padding: 10px 16px;
+            display: table;
+            width: 100%;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1000;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+        }
+
+        .header-cell {
+            display: table-cell;
+            vertical-align: middle;
+        }
+
+        .avatar {
+            width: 40px;
+            height: 40px;
+            background-color: #128c7e;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 40px;
+            font-weight: bold;
+            font-size: 16px;
+            color: white;
+            display: inline-block;
+        }
+
+        .user-info {
+            padding-left: 12px;
+            display: inline-block;
+            vertical-align: middle;
+        }
+
+        .user-info h1 {
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .user-info p {
+            font-size: 12px;
+            color: #d1f4ec;
+        }
+
+        /* Contenedor de Chat */
+        .chat-container {
+            max-width: 500px;
+            margin: 0 auto;
+            padding: 75px 14px 40px 14px;
+            min-height: 100vh;
+        }
+
+        /* Globos de Mensaje */
+        .message-row {
+            margin-bottom: 12px;
+            width: 100%;
+            clear: both;
+            overflow: hidden;
+        }
+
+        .msg {
+            max-width: 85%;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 14.5px;
+            line-height: 1.4;
+            position: relative;
+            box-shadow: 0 1px 0.5px rgba(0,0,0,0.13);
+        }
+
+        .msg-bot {
+            background-color: #ffffff;
+            float: left;
+            border-top-left-radius: 0;
+        }
+
+        .msg-user {
+            background-color: #d9fdd3;
+            float: right;
+            border-top-right-radius: 0;
+        }
+
+        .time {
+            font-size: 10px;
+            color: #667781;
+            text-align: right;
+            margin-top: 4px;
+            display: block;
+        }
+
+        /* Opciones de Menú Inicial */
+        .options-container {
+            margin-top: 15px;
+            clear: both;
+            text-align: center;
+        }
+
+        .btn-option {
+            background-color: #ffffff;
+            color: #008069;
+            border: 1px solid #e1e1e1;
+            padding: 12px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+            margin: 6px auto;
+            cursor: pointer;
+            display: block;
+            width: 90%;
+            max-width: 320px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+            transition: background 0.2s;
+        }
+
+        .btn-option:hover {
+            background-color: #f7f8fa;
+        }
+
+        /* Formularios e Info Boxes */
+        .chat-form {
+            background: #ffffff;
+            border-radius: 8px;
+            padding: 12px;
+            margin-top: 10px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            text-align: left;
+        }
+
+        .form-group {
+            margin-bottom: 12px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 12px;
+            font-weight: bold;
+            color: #008069;
+            margin-bottom: 4px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: 14px;
+            outline: none;
+        }
+
+        .form-group input:focus {
+            border-color: #008069;
+        }
+
+        /* Bloque de pago SPEI */
+        .spei-box {
+            background-color: #f8f9fa;
+            border-left: 4px solid #0056b3;
+            padding: 10px;
+            margin: 10px 0;
+            font-size: 13.5px;
+            border-radius: 4px;
+        }
+
+        .spei-row {
+            margin-bottom: 5px;
+        }
+
+        .spei-label {
+            font-weight: bold;
+            color: #555;
+        }
+
+        .spei-value {
+            font-family: monospace;
+            font-size: 15px;
+            color: #111;
+            font-weight: bold;
+        }
+
+        /* Botón de Adjuntar Archivo */
+        .btn-file {
+            background-color: #f0f2f5;
+            color: #54656f;
+            border: 1px dashed #a1a1a1;
+            width: 100%;
+            padding: 12px;
+            border-radius: 6px;
+            font-size: 13.5px;
+            font-weight: 600;
+            cursor: pointer;
+            text-align: center;
+            display: block;
+            margin-top: 10px;
+        }
+
+        .btn-submit {
+            background-color: #00a884;
+            color: white;
+            border: none;
+            width: 100%;
+            padding: 12px;
+            border-radius: 6px;
+            font-size: 15px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 8px;
+        }
+
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header Fijo -->
+    <div class="header">
+        <div class="header-cell" style="width: 45px;">
+            <div class="avatar">B</div>
+        </div>
+        <div class="header-cell">
+            <div class="user-info">
+                <h1>Bajaloya Trámites</h1>
+                <p id="status-text">En línea</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Chat Completo -->
+    <div class="chat-container">
+        
+        <!-- BIENVENIDA -->
+        <div class="message-row">
+            <div class="msg msg-bot">
+                ¡Hola! Bienvenido a <b>Bajaloya</b>. Te ayudo a descargar tus archivos oficiales en minutos directo a tu celular. ⚡
+                <span class="time">11:00 PM</span>
+            </div>
+        </div>
+
+        <div class="message-row">
+            <div class="msg msg-bot">
+                ¿Qué trámite deseas realizar hoy? Elige una opción aquí abajo 👇
+                <span class="time">11:00 PM</span>
+            </div>
+        </div>
+
+        <!-- MENÚ DE OPCIONES INICIALES -->
+        <div class="options-container" id="menu-inicial">
+            <button class="btn-option" onclick="iniciarTramite('csf')">Constancia de Situación Fiscal — $60</button>
+            <button class="btn-option" onclick="iniciarTramite('acta')">Acta de Nacimiento (Cualquier Estado)</button>
+        </div>
+
+        <!-- BLOQUE UNIFICADO DEL FLUJO (Oculto al inicio) -->
+        <div id="flujo-activo" class="hidden">
+            
+            <!-- Respuesta simulada del usuario -->
+            <div class="message-row">
+                <div class="msg msg-user" id="respuesta-usuario-txt">
+                    <!-- Dinámico -->
+                    <span class="time">11:01 PM</span>
+                </div>
+            </div>
+
+            <!-- CAPTURA DE DATOS -->
+            <div class="message-row" id="bloque-captura">
+                <div class="msg msg-bot">
+                    Perfecto. Para consultar tu Constancia y enviarte las notificaciones de entrega, por favor ingresa tus datos completos.
+                    
+                    <div class="chat-form">
+                        <div class="form-group">
+                            <label>Tu número de WhatsApp (10 dígitos):</label>
+                            <input type="tel" id="whatsapp" placeholder="Ej. 5512345678" maxlength="10">
+                        </div>
+                        <div class="form-group">
+                            <label>RFC (13 caracteres):</label>
+                            <input type="text" id="rfc" placeholder="ABCD123456XYZ" maxlength="13" style="text-transform: uppercase;">
+                        </div>
+                        <div class="form-group">
+                            <label>IDcif (Número de trámite / Código de barras):</label>
+                            <input type="text" id="idcif" placeholder="Ej. 170XXXXXXXX" maxlength="20">
+                        </div>
+                        <button class="btn-submit" onclick="validarYMostrarPago()">Validar y Continuar</button>
+                    </div>
+                    <span class="time">11:01 PM</span>
+                </div>
+            </div>
+
+            <!-- PASO DE PAGO Y TRANSFERENCIA (Aparece tras validar) -->
+            <div id="bloque-pago" class="hidden">
+                <div class="message-row">
+                    <div class="msg msg-bot">
+                        🔄 Procesando datos... ¡Listo! He validado tu información de acceso. 
+                        <br><br>
+                        Realiza tu transferencia SPEI desde la app de tu banco para liberar la descarga automática de tu archivo:
+                        
+                        <div class="chat-form">
+                            <div class="spei-box">
+                                <div class="spei-row"><span class="spei-label">Banco:</span> <span style="font-weight:600;">STP / BBVA</span></div>
+                                <div class="spei-row"><span class="spei-label">CLABE:</span> <span class="spei-value">1234 5678 9012 3456 78</span></div>
+                                <div class="spei-row"><span class="spei-label">Concepto:</span> <span class="spei-value" id="concepto-dinamico">CSF-XXXXXX</span></div>
+                                <div class="spei-row"><span class="spei-label">Monto:</span> <span style="font-weight:bold; color:#008069;">$60.00 MXN</span></div>
+                            </div>
+                            
+                            <p style="font-size: 13px; margin: 10px 0 5px 0; color: #667781;">👇 Una vez hecha la transferencia, toma una captura de pantalla y súbela aquí:</p>
+                            
+                            <label class="btn-file" id="file-label" for="comprobante-file">
+                                📎 Adjuntar Captura de Pago
+                            </label>
+                            <input type="file" id="comprobante-file" accept="image/*,application/pdf" style="display:none;" onchange="archivoSeleccionado()">
+                            
+                            <button class="btn-submit" id="btn-enviar-pedido" onclick="finalizarPedido()" style="background-color: #008069; display:none;">
+                                🚀 Enviar Comprobante y Registrar Pedido
+                            </button>
+                        </div>
+                        <span class="time">11:02 PM</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CONFIRMACIÓN DE RECEPCIÓN -->
+            <div id="bloque-final" class="hidden">
+                <div class="message-row">
+                    <div class="msg msg-bot" style="background-color: #e3f2fd;">
+                        📥 <b>¡Comprobante recibido con éxito!</b>
+                        <br><br>
+                        Tu pedido ha sido registrado en el panel administrativo con el concepto <b id="concepto-confirmado"></b>. Estamos validando el depósito en la cuenta.
+                        <br><br>
+                        ⏱️ En un lapso de 5 a 15 minutos tu PDF se liberará de forma automática en esta pantalla y se enviará un respaldo al WhatsApp <b id="whatsapp-confirmado"></b> que nos proporcionaste. ¡Gracias por tu preferencia!
+                        <span class="time">11:03 PM</span>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+    <script>
+        function mostrarEscribiendo(callback) {
+            const status = document.getElementById('status-text');
+            status.textContent = 'Escribiendo...';
+            setTimeout(() => {
+                status.textContent = 'En línea';
+                if(callback) callback();
+            }, 1100);
+        }
+
+        function iniciarTramite(tipo) {
+            if(tipo !== 'csf') {
+                alert('El módulo de actas dinámicas estará disponible próximamente.');
+                return;
+            }
+            
+            document.getElementById('menu-inicial').classList.add('hidden');
+            document.getElementById('respuesta-usuario-txt').innerHTML = 'Quiero mi Constancia de Situación Fiscal ($60) <span class="time">11:01 PM</span>';
+            
+            mostrarEscribiendo(() => {
+                document.getElementById('flujo-activo').classList.remove('hidden');
+                window.scrollTo(0, document.body.scrollHeight);
+            });
+        }
+
+        function validarYMostrarPago() {
+            const whatsapp = document.getElementById('whatsapp').value.trim();
+            const rfc = document.getElementById('rfc').value.toUpperCase().trim();
+            const idcif = document.getElementById('idcif').value.trim();
+
+            if(!whatsapp || !rfc || !idcif) {
+                alert('Por favor, ingresa tu WhatsApp, tu RFC y tu IDcif para poder continuar.');
+                return;
+            }
+
+            if(whatsapp.length < 10) {
+                alert('Por favor, ingresa un número de WhatsApp válido a 10 dígitos.');
+                return;
+            }
+
+            // Generar concepto dinámico simple basado en los primeros 6 caracteres del RFC
+            const subRfc = rfc.length >= 6 ? rfc.substring(0, 6) : "DOC";
+            document.getElementById('concepto-dinamico').textContent = "CSF-" + subRfc;
+
+            // Bloquear inputs para emular guardado de datos
+            document.getElementById('whatsapp').disabled = true;
+            document.getElementById('rfc').disabled = true;
+            document.getElementById('idcif').disabled = true;
+
+            mostrarEscribiendo(() => {
+                document.getElementById('bloque-pago').classList.remove('hidden');
+                window.scrollTo(0, document.body.scrollHeight);
+            });
+        }
+
+        function archivoSeleccionado() {
+            const fileInput = document.getElementById('comprobante-file');
+            const fileLabel = document.getElementById('file-label');
+            const btnEnviar = document.getElementById('btn-enviar-pedido');
+            
+            if(fileInput.files.length > 0) {
+                fileLabel.innerHTML = "✅ " + fileInput.files[0].name;
+                fileLabel.style.backgroundColor = "#e8f5e9";
+                fileLabel.style.color = "#2e7d32";
+                fileLabel.style.borderStyle = "solid";
+                btnEnviar.style.display = "block";
+                window.scrollTo(0, document.body.scrollHeight);
+            }
+        }
+
+        function finalizarPedido() {
+            const concepto = document.getElementById('concepto-dinamico').textContent;
+            const whatsapp = document.getElementById('whatsapp').value;
+            
+            document.getElementById('concepto-confirmado').textContent = concepto;
+            document.getElementById('whatsapp-confirmado').textContent = whatsapp;
+            
+            mostrarEscribiendo(() => {
+                document.getElementById('bloque-final').classList.remove('hidden');
+                window.scrollTo(0, document.body.scrollHeight);
+            });
+        }
+    </script>
+</body>
+</html>
