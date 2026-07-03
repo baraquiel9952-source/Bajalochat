@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <meta name="description" content="Bajaloya - Trámites Express Seguro">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline';">
+    <title>Bajaloya - Trámites Express v4.5 Directo</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: #efeae2;
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 80 80"><g fill="%23e5ddd5" fill-opacity="0.4"><path d="M10 0h10v10H10zm20 20h10v10H30zm20 20h10v10H50zm20 20h10v10H70zM0 50h10v10H0zm20 20h10v10H20z"/></g></svg>');
+            display: block;
+            height: 100vh;
+            color: #111b21;
+        }
+
+        .header {
+            background-color: #008069;
+            color: white;
+            padding: 10px 16px;
+            display: table;
+            width: 100%;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1000;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+        }
+
+        .header-cell {
+            display: table-cell;
+            vertical-align: middle;
+        }
+
+        .avatar {
+            width: 40px;
+            height: 40px;
+            background-color: #128c7e;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 40px;
+            font-weight: bold;
+            font-size: 16px;
+            color: white;
+            display: inline-block;
+        }
+
+        .user-info {
+            padding-left: 12px;
+            display: inline-block;
+            vertical-align: middle;
+        }
+
+        .user-info h1 {
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .user-info p {
+            font-size: 12px;
+            color: #d1f4ec;
+        }
+
+        .chat-container {
+            max-width: 500px;
+            margin: 0 auto;
+            padding: 75px 14px 40px 14px;
+            min-height: 100vh;
+        }
+
+        .message-row {
+            margin-bottom: 12px;
+            width: 100%;
+            clear: both;
+            overflow: hidden;
+        }
+
+        .msg {
+            max-width: 85%;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 14.5px;
+            line-height: 1.4;
+            position: relative;
+            box-shadow: 0 1px 0.5px rgba(0,0,0,0.13);
+        }
+
+        .msg-bot {
+            background-color: #ffffff;
+            float: left;
+            border-top-left-radius: 0;
+        }
+
+        .msg-user {
+            background-color: #d9fdd3;
+            float: right;
+            border-top-right-radius: 0;
+        }
+
+        .time {
+            font-size: 10px;
+            color: #667781;
+            text-align: right;
+            margin-top: 4px;
+            display: block;
+        }
+
+        .options-container {
+            margin-top: 15px;
+            clear: both;
+            text-align: center;
+        }
+
+        .btn-option {
+            background-color: #ffffff;
+            color: #008069;
+            border: 1px solid #e1e1e1;
+            padding: 12px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+            margin: 6px auto;
+            cursor: pointer;
+            display: block;
+            width: 90%;
+            max-width: 320px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+            transition: background 0.2s;
+        }
+
+        .btn-option:hover {
+            background-color: #f7f8fa;
+        }
+
+        .btn-option:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .chat-form {
+            background: #ffffff;
+            border-radius: 8px;
+            padding: 12px;
+            margin-top: 10px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            text-align: left;
+        }
+
+        .form-group {
+            margin-bottom: 12px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 12px;
+            font-weight: bold;
+            color: #008069;
+            margin-bottom: 4px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: 14px;
+            outline: none;
+        }
+
+        .form-group input:focus {
+            border-color: #008069;
+        }
+
+        .form-group input:disabled {
+            background-color: #f5f5f5;
+            cursor: not-allowed;
+        }
+
+        .spei-box {
+            background-color: #f8f9fa;
+            border-left: 4px solid #0056b3;
+            padding: 10px;
+            margin: 10px 0;
+            font-size: 13.5px;
+            border-radius: 4px;
+            word-break: break-all;
+        }
+
+        .spei-row {
+            margin-bottom: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            flex-wrap: wrap;
+            gap: 5px;
+        }
+
+        .spei-label {
+            font-weight: bold;
+            color: #555;
+        }
+
+        .spei-value {
+            font-family: monospace;
+            font-size: 15px;
+            color: #111;
+            font-weight: bold;
+        }
+
+        .btn-copy {
+            padding: 3px 8px;
+            font-size: 11px;
+            background: #008069;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background 0.2s;
+        }
+
+        .btn-copy:active {
+            background: #128c7e;
+        }
+
+        .btn-submit {
+            background-color: #00a884;
+            color: white;
+            border: none;
+            width: 100%;
+            padding: 12px;
+            border-radius: 6px;
+            font-size: 15px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 8px;
+            transition: background-color 0.3s;
+        }
+
+        .btn-submit:hover {
+            background-color: #008069;
+        }
+
+        .btn-submit:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+
+        .btn-whatsapp {
+            background-color: #25d366;
+            color: white;
+            border: none;
+            width: 100%;
+            padding: 12px;
+            border-radius: 6px;
+            font-size: 15px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 8px;
+            transition: background-color 0.3s;
+        }
+
+        .btn-whatsapp:hover {
+            background-color: #1da851;
+        }
+
+        .btn-whatsapp:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+
+        .error-message {
+            background-color: #ffebee;
+            border-left: 4px solid #c62828;
+            color: #c62828;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+            font-size: 13px;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            background-color: #008069;
+            border-radius: 50%;
+            animation: spinner 1.2s infinite;
+            margin-right: 4px;
+        }
+
+        @keyframes spinner {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 1; }
+        }
+
+        .warning-box {
+            background-color: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+            font-size: 13px;
+            color: #856404;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <div class="header-cell" style="width: 45px;">
+            <div class="avatar">B</div>
+        </div>
+        <div class="header-cell">
+            <div class="user-info">
+                <h1>Bajaloya Trámites</h1>
+                <p id="status-text">En línea</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="chat-container">
+        
+        <div class="message-row">
+            <div class="msg msg-bot">
+                ¡Hola! Bienvenido a <b>Bajaloya</b>. Te ayudo a descargar tus archivos oficiales en minutos directo a tu celular. ⚡
+                <span class="time">11:00 PM</span>
+            </div>
+        </div>
+
+        <div class="message-row">
+            <div class="msg msg-bot">
+                ¿Qué trámite deseas realizar hoy? Elige una opción aquí abajo 👇
+                <span class="time">11:00 PM</span>
+            </div>
+        </div>
+
+        <div class="options-container" id="menu-inicial">
+            <button class="btn-option" onclick="iniciarTramite('csf')" id="btn-csf">Constancia de Situación Fiscal — $60</button>
+            <button class="btn-option" onclick="iniciarTramite('acta')" id="btn-acta">Acta de Nacimiento (Cualquier Estado)</button>
+        </div>
+
+        <div id="flujo-activo" class="hidden">
+            
+            <div class="message-row">
+                <div class="msg msg-user" id="respuesta-usuario-txt">
+                    <span class="time">11:01 PM</span>
+                </div>
+            </div>
+
+            <div class="message-row" id="bloque-captura">
+                <div class="msg msg-bot">
+                    Perfecto. Para consultar tu Constancia y enviarte las notificaciones de entrega, por favor ingresa tus datos completos.
+                    
+                    <div class="chat-form">
+                        <div id="error-container"></div>
+                        
+                        <div class="form-group">
+                            <label for="whatsapp">Tu número de WhatsApp (10 dígitos):</label>
+                            <input type="tel" id="whatsapp" placeholder="Ej. 5512345678" maxlength="10" pattern="[0-9]{10}" required aria-required="true">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="rfc">RFC (13 caracteres):</label>
+                            <input type="text" id="rfc" placeholder="ABCD123456XYZ" maxlength="13" pattern="[A-Z0-9]{13}" required aria-required="true" style="text-transform: uppercase;">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="idcif">IDcif (Número de trámite / Código de barras):</label>
+                            <input type="text" id="idcif" placeholder="Ej. 170XXXXXXXX" maxlength="20" required aria-required="true">
+                        </div>
+                        
+                        <button class="btn-submit" id="btn-validar" onclick="validarYMostrarPago()">Validar y Continuar</button>
+                    </div>
+                    <span class="time">11:01 PM</span>
+                </div>
+            </div>
+
+            <div id="bloque-pago" class="hidden">
+                <div class="message-row">
+                    <div class="msg msg-bot">
+                        <span class="spinner"></span><span id="procesando-text">Procesando datos...</span>
+                        <br><br>
+                        <span id="pago-info" class="hidden">
+                            He validado tu información de acceso. Realiza tu transferencia SPEI desde la app de tu banco para liberar la descarga automática de tu archivo:
+                            
+                            <div class="chat-form">
+                                <div class="warning-box">
+                                    ⚠️ <strong>Seguridad:</strong> Los datos SPEI se cargan dinámicamente desde el servidor. Nunca compartas esta información por teléfono.
+                                </div>
+
+                                <div class="spei-box" id="spei-container">
+                                    <div class="spei-row"><span class="spei-label">Entidad Financiera:</span> <span style="font-weight:600;" id="banco-name">clip</span></div>
+                                    <div class="spei-row"><span class="spei-label">Titular:</span> <span style="font-weight:600;">PAUL DAVID MARQUEZ ELVIRA</span></div>
+                                    <div class="spei-row">
+                                        <span class="spei-label">CLABE:</span> 
+                                        <span class="spei-value" id="clabe-value">7309 6900 0006 5189 52</span>
+                                        <button type="button" class="btn-copy" onclick="copiarClabe()">Copiar</button>
+                                    </div>
+                                    <div class="spei-row"><span class="spei-label">Concepto:</span> <span class="spei-value" id="concepto-dinamico">CSF-XXXXXX</span></div>
+                                    <div class="spei-row"><span class="spei-label">Monto:</span> <span style="font-weight:bold; color:#008069;">$60.00 MXN</span></div>
+                                </div>
+                                
+                                <p style="font-size: 13px; margin: 15px 0 10px 0; color: #667781;">👇 Da clic abajo para abrir nuestro chat privado, enviar tus datos y adjuntar tu captura de pantalla de pago:</p>
+                                
+                                <button type="button" class="btn-whatsapp" id="btn-enviar-pedido" onclick="abrirWhatsAppDirecto()">
+                                    💬 Abrir WhatsApp y Enviar Datos
+                                </button>
+                            </div>
+                        </span>
+                        <span class="time">11:02 PM</span>
+                    </div>
+                </div>
+            </div>
+
+            <div id="bloque-final" class="hidden">
+                <div class="message-row">
+                    <div class="msg msg-bot" style="background-color: #e3f2fd;">
+                        📥 <b>¡Redireccionando a soporte!</b>
+                        <br><br>
+                        Tu solicitud con concepto <b id="concepto-confirmado"></b> ha sido procesada de forma segura. Te estamos enviando a WhatsApp.
+                        <br><br>
+                        ⏱️ Una vez que nos mandes el texto preestablecido junto a tu captura de pantalla en el chat, tu archivo se liberará y enviará al número <b id="whatsapp-confirmado"></b> en un lapso de 5 a 15 minutos. ¡Gracias!
+                        <span class="time">11:03 PM</span>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+    <script>
+        let requestCount = 0;
+        const MAX_REQUESTS = 5;
+        let lastRequestTime = 0;
+        const REQUEST_WINDOW = 60000;
+
+        function checkRateLimit() {
+            const now = Date.now();
+            if (now - lastRequestTime > REQUEST_WINDOW) {
+                requestCount = 0;
+                lastRequestTime = now;
+            }
+            if (requestCount >= MAX_REQUESTS) {
+                showError("Demasiadas solicitudes. Intenta más tarde.");
+                return false;
+            }
+            requestCount++;
+            return true;
+        }
+
+        function sanitizeHTML(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function validarWhatsApp(whatsapp) {
+            const regex = /^[0-9]{10}$/;
+            return regex.test(whatsapp);
+        }
+
+        function validarRFC(rfc) {
+            const regex = /^[A-Z]{4}[0-9]{6}[A-Z0-9]{3}$/;
+            return regex.test(rfc);
+        }
+
+        function validarIDcif(idcif) {
+            return idcif.length >= 8 && idcif.length <= 20;
+        }
+
+        function showError(message) {
+            const errorContainer = document.getElementById('error-container');
+            if (!errorContainer) return;
+            
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'error-message';
+            errorDiv.textContent = '❌ ' + sanitizeHTML(message);
+            errorContainer.innerHTML = '';
+            errorContainer.appendChild(errorDiv);
+        }
+
+        function clearError() {
+            const errorContainer = document.getElementById('error-container');
+            if (errorContainer) errorContainer.innerHTML = '';
+        }
+
+        function mostrarEscribiendo(callback) {
+            const status = document.getElementById('status-text');
+            status.textContent = 'Escribiendo...';
+            setTimeout(() => {
+                status.textContent = 'En línea';
+                if(callback) callback();
+            }, 1100);
+        }
+
+        function iniciarTramite(tipo) {
+            try {
+                if (!checkRateLimit()) return;
+
+                if(tipo !== 'csf') {
+                    showError('El módulo de actas dinámicas estará disponible próximamente.');
+                    return;
+                }
+                
+                document.getElementById('menu-inicial').classList.add('hidden');
+                document.getElementById('respuesta-usuario-txt').innerHTML = sanitizeHTML('Quiero mi Constancia de Situación Fiscal ($60)') + ' <span class="time">11:01 PM</span>';
+                
+                mostrarEscribiendo(() => {
+                    document.getElementById('flujo-activo').classList.remove('hidden');
+                    window.scrollTo(0, document.body.scrollHeight);
+                });
+            } catch (e) {
+                console.error('Error:', e);
+                showError('Error al iniciar trámite. Intenta de nuevo.');
+            }
+        }
+
+        function validarYMostrarPago() {
+            try {
+                if (!checkRateLimit()) return;
+
+                clearError();
+                
+                const whatsapp = document.getElementById('whatsapp').value.trim();
+                const rfc = document.getElementById('rfc').value.toUpperCase().trim();
+                const idcif = document.getElementById('idcif').value.trim();
+
+                if(!whatsapp || !rfc || !idcif) {
+                    showError('Por favor, ingresa tu WhatsApp, RFC e IDcif.');
+                    return;
+                }
+
+                if(!validarWhatsApp(whatsapp)) {
+                    showError('Número de WhatsApp inválido. Debe ser de 10 dígitos.');
+                    return;
+                }
+
+                if(!validarRFC(rfc)) {
+                    showError('RFC inválido. Formato: ABCD123456XYZ');
+                    return;
+                }
+
+                if(!validarIDcif(idcif)) {
+                    showError('IDcif inválido. Debe tener entre 8 y 20 caracteres.');
+                    return;
+                }
+
+                const subRfc = rfc.substring(0, 6);
+                document.getElementById('concepto-dinamico').textContent = "CSF-" + sanitizeHTML(subRfc);
+
+                document.getElementById('whatsapp').disabled = true;
+                document.getElementById('rfc').disabled = true;
+                document.getElementById('idcif').disabled = true;
+                document.getElementById('btn-validar').disabled = true;
+
+                document.getElementById('bloque-pago').classList.remove('hidden');
+                document.getElementById('procesando-text').textContent = 'Datos validados correctamente. Cargando información de pago...';
+
+                setTimeout(() => {
+                    document.getElementById('procesando-text').classList.add('hidden');
+            document.getElementById('whatsapp').value = '';
+                        document.getElementById('rfc').value = '';
+                        document.getElementById('idcif').value = '';
+                    }, 2000);
+                }, 1500);
+
+            } catch (e) {
+                console.error('Error:', e);
+                showError('Error al conectar con WhatsApp. Inténtalo de nuevo.');
+            }
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'F12' || (e.ctrlKey && e.shiftKey && e.key === 'I')) {
+                e.preventDefault();
+            }
+        });
+    </script>
+</body>
+</html>
